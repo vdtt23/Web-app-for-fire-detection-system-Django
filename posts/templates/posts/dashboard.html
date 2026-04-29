@@ -1,0 +1,47 @@
+{% extends "posts/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<h1 class="page-title">Fire Detection System</h1>
+
+<div class="card">
+    <p>Monitoring sensors from Fili device</p>
+</div>
+
+<h2>Realtime Sensor Chart</h2>
+
+<div class="card">
+    <canvas id="sensorChart"></canvas>
+</div>
+
+<table class="node-table">
+    <thead>
+        <tr>
+            <th>Node</th>
+            <th>Temp</th>
+            <th>Smoke</th>
+            <th>Humidity</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for node in nodes %}
+        <tr class="row-{{ node.status|lower }}">
+            <td>{{ node.note_id }}</td>
+            <td>{{ node.temperature }}</td>
+            <td>{{ node.smoke }}</td>
+            <td>{{ node.humidity }}</td>
+            <td class="status {{ node.status|lower }}">{{ node.status }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'js/chart.js' %}"></script>
+<script src="{% static 'js/table.js' %}"></script>
+{% endblock %}

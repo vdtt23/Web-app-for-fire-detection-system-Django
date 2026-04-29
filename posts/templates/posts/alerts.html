@@ -1,0 +1,16 @@
+{% extends "posts/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<h2>Alerts</h2>
+
+<div id="alert-list">
+    <p>Loading alerts...</p>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/alerts.js' %}"></script>
+{% endblock %}

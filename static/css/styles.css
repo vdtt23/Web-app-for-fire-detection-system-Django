@@ -1,0 +1,216 @@
+/* GLOBAL */
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #eef2ff, #f8fafc);
+    color: #1f2937;
+}
+
+/* LAYOUT */
+.layout {
+    display: flex;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 70px;
+    height: 100vh;
+    position: fixed;
+
+    padding: 15px 8px;
+
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(12px);
+    border-right: 1px solid #e5e7eb;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    overflow: hidden;
+    transition: width 0.25s ease;
+}
+
+.sidebar:hover {
+    width: 220px;
+}
+
+/* LOGO */
+.logo {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.sidebar:hover .logo {
+    justify-content: flex-start;
+}
+
+.logo svg {
+    width: 28px;
+    height: 28px;
+}
+
+.logo-text {
+    white-space: nowrap;
+}
+
+.sidebar:not(:hover) .logo-text {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+}
+
+/* MENU */
+.menu {
+    width: 100%;
+}
+
+.menu a {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    gap: 14px;
+
+    padding: 12px;
+    margin-bottom: 10px;
+
+    border-radius: 12px;
+
+    text-decoration: none;
+    color: #374151;
+
+    transition: all 0.2s ease;
+}
+
+/* COLLAPSE MODE */
+.sidebar:not(:hover) .menu a {
+    justify-content: center;
+    padding: 12px 0;
+    gap: 0;
+}
+
+/* HOVER */
+.menu a:hover {
+    background: #e0e7ff;
+    color: #4f46e5;
+}
+
+/* ACTIVE */
+.menu a.active {
+    background: #6366f1;
+    color: white;
+}
+
+/* ICON */
+.icon {
+    position: relative;
+
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon svg {
+    width: 22px;
+    height: 22px;
+    display: block;
+    stroke: currentColor;
+}
+
+/* TEXT */
+.text {
+    white-space: nowrap;
+}
+
+.sidebar:not(:hover) .text {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+}
+
+/* TOOLTIP */
+.sidebar:not(:hover) .menu a {
+    position: relative;
+}
+
+.sidebar:not(:hover) .menu a:hover::after {
+    content: attr(data-title);
+    position: absolute;
+
+    left: 60px;
+
+    background: #111;
+    color: white;
+
+    padding: 6px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+/* MAIN */
+.main {
+    margin-left: 80px;
+    padding: 30px;
+    width: 100%;
+}
+
+.sidebar:hover ~ .main {
+    margin-left: 240px;
+}
+
+/* CARD */
+.card {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(10px);
+
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 15px;
+
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+/* TITLE */
+.page-title {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+/* TABLE */
+.node-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+/* header */
+.node-table th {
+    text-align: left;
+    padding: 14px 24px;   
+    font-weight: 600;
+    color: #374151;
+}
+
+/* data */
+.node-table td {
+    padding: 14px 24px;   
+}
+
+/* line split */
+.node-table th,
+.node-table td {
+    border-bottom: 1px solid #e5e7eb;
+}

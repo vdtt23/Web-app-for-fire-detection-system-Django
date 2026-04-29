@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fili</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <!-- LOGO -->
+        <div class="logo">
+            <span class="logo-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+                </svg>
+            </span>
+            <span class="logo-text">Fili</span>
+        </div>
+
+        <!-- MENU -->
+        <nav class="menu">
+
+            <a href="/" class="{% if request.path == '/' %}active{% endif %}" data-title="Home">
+                <span class="icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 10l9-7 9 7"/>
+                        <path d="M9 21V12h6v9"/>
+                    </svg>
+                </span>
+                <span class="text">Home</span>
+            </a>
+
+            <a href="/dashboard/" class="{% if 'dashboard' in request.path %}active{% endif %}" data-title="Dashboard">
+                <span class="icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"/>
+                        <rect x="14" y="3" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/>
+                        <rect x="3" y="14" width="7" height="7"/>
+                    </svg>
+                </span>
+                <span class="text">Dashboard</span>
+            </a>
+
+            <a href="/alerts/" class="{% if 'alerts' in request.path %}active{% endif %}" data-title="Alerts">
+                <span class="icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10 2h4l7 18H3L10 2z"/>
+                        <line x1="12" y1="9" x2="12" y2="13"/>
+                        <circle cx="12" cy="17" r="1"/>
+                    </svg>
+                </span>
+                <span class="text">Alerts</span>
+            </a>
+
+            <a href="/about/" data-title="About">
+                <span class="icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="16" x2="12" y2="12"/>
+                    </svg>
+                </span>
+                <span class="text">About</span>
+            </a>
+
+            <a href="/support/" data-title="Support">
+                <span class="icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M8 15s1.5 2 4 2 4-2 4-2"/>
+                    </svg>
+                </span>
+                <span class="text">Support</span>
+            </a>
+
+        </nav>
+
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+        {% block content %}{% endblock %}
+    </main>
+
+</div>
+
+{% block scripts %}{% endblock %}
+
+</body>
+</html>
