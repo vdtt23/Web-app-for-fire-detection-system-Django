@@ -17,7 +17,7 @@ Hệ thống phát hiện cháy theo thời gian thực sử dụng mô phỏng 
 ## ✨ Features
 
 * 📡 Thu thập dữ liệu: Temperature, Smoke, Humidity
-* 🔄 Dashboard realtime (không cần reload)
+* 🔄 Dashboard realtime 
 * 📊 Biểu đồ sensor realtime
 * 🚨 Cảnh báo FIRE / WARNING
 * 🔌 Tự động reconnect khi mất socket
