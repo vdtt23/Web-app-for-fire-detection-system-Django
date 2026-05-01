@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from posts.models import SensorData
-
+from django.utils import timezone
 
 def home(request):
     return render(request, 'posts/home.html')
@@ -23,7 +23,7 @@ def chart_data(request):
     qs = SensorData.objects.order_by('-created_at')[:20][::-1]  
 
     data = {
-        "labels": [d.created_at.strftime("%H:%M:%S") for d in qs],
+        "labels": [timezone.localtime(d.created_at).strftime("%H:%M:%S") for d in qs],
         "temp": [d.temperature for d in qs],
         "smoke": [d.smoke for d in qs],
         "humidity": [d.humidity for d in qs],
