@@ -214,3 +214,20 @@ body {
 .node-table td {
     border-bottom: 1px solid #e5e7eb;
 }
+
+/* MAP */
+.map-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;   /* center ngang */
+    justify-content: center;
+    width: 100%;
+}
+
+#map {
+    width: 800px;
+    height: 500px;
+    border: 2px solid #ccc;
+    background: #f5f5f5;
+    margin-top: 20px;
+}

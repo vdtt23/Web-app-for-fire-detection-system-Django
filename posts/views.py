@@ -31,18 +31,22 @@ def chart_data(request):
     return JsonResponse(data)
 
 def latest_nodes(request):
-    qs = SensorData.objects.order_by('-created_at')[:10]
-    data = [
-        {
-            "node_id": n.node_id,
-            "temperature": n.temperature,
-            "smoke": n.smoke,
-            "humidity": n.humidity,
-            "status": n.status,
-        }
-        for n in qs
-    ]
-    return JsonResponse(data, safe=False)
+    nodes = {}
+    qs = SensorData.objects.order_by('-created_at')
+
+    for n in qs:
+        if n.node_id not in nodes:
+            nodes[n.node_id] = {
+                "node_id": n.node_id,
+                "temperature": n.temperature,
+                "smoke": n.smoke,
+                "humidity": n.humidity,
+                "status": n.status,
+                "x": n.x,
+                "y": n.y,
+            }
+
+    return JsonResponse(list(nodes.values()), safe=False)
 
 def alerts(request):
     alerts = SensorData.objects.filter(
@@ -73,7 +77,8 @@ def latest_alerts(request):
 
 def about(request):
     return render(request, 'posts/about.html')
-
-
 def support(request):
     return render(request, 'posts/support.html')
+
+def node_map(request):
+    return render(request, 'posts/nodemap.html')

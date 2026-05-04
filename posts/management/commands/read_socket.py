@@ -25,7 +25,7 @@ class Command(BaseCommand):
         PORT = int(os.getenv("SOCKET_PORT", 60001))
 
         pattern = re.compile(
-            r"node_id:(\d+),\s*T=(\d+)\s*S=(\d+)\s*H=(\d+)"
+            r"node_id:(\d+), T=(\d+) S=(\d+) H=(\d+) X=(\d+) Y=(\d+)"
         )
 
         while True:
@@ -53,8 +53,7 @@ class Command(BaseCommand):
 
                         match = pattern.search(line)
                         if match:
-                            node, temp, smoke, hum = match.groups()
-
+                            node, temp, smoke, hum, x, y = match.groups()
                             temp = int(temp)
                             smoke = int(smoke)
 
@@ -70,7 +69,9 @@ class Command(BaseCommand):
                                 temperature=temp,
                                 smoke=smoke,
                                 humidity=int(hum),
-                                status=status
+                                status=status,
+                                x=float(x),
+                                y=float(y),
                             )
 
                             count = SensorData.objects.count()

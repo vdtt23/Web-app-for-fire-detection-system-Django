@@ -6,6 +6,8 @@ class SensorData(models.Model):
     temperature = models.FloatField()
     smoke = models.FloatField()
     humidity = models.FloatField()
+    x = models.FloatField(null=True, blank=True)
+    y = models.FloatField(null=True, blank=True)
 
     status = models.CharField(max_length=10)  # SAFE / WARNING / FIRE
 
