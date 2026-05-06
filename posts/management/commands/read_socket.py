@@ -21,20 +21,21 @@ logger = logging.getLogger(__name__)
 
 load_dotenv()
 
-# Reminder cooldown: avoid repeated emails for unchanged WARNING/FIRE states.
+# Cooldown: avoid re-alerting the same node within this many seconds
 ALERT_REMINDER_COOLDOWN = getattr(settings, "ALERT_REMINDER_COOLDOWN", 1800)
 
 
 def _get_alert_recipients():
-    env_recipients = [r.strip() for r in settings.ALERT_EMAIL_RECIPIENTS if r.strip()]
-
-    # Only send to users who are currently logged in (have a non-expired session).
+    # Only send to users who are currently online.
+    # A user is considered online if they sent a heartbeat within the last 3 minutes.
+    cutoff = int(time.time()) - 180  # 3 minutes
     active_sessions = Session.objects.filter(expire_date__gte=timezone.now())
     logged_in_ids = set()
     for session in active_sessions:
         data = session.get_decoded()
         uid = data.get("_auth_user_id")
-        if uid:
+        last_hb = data.get("last_heartbeat", 0)
+        if uid and int(last_hb) >= cutoff:
             logged_in_ids.add(int(uid))
 
     user_recipients = list(
@@ -43,10 +44,10 @@ def _get_alert_recipients():
         .values_list("email", flat=True)
     )
 
-    # Keep original casing in outgoing addresses while deduplicating case-insensitively.
+    # Deduplicate case-insensitively.
     seen = set()
     merged = []
-    for email in env_recipients + user_recipients:
+    for email in user_recipients:
         key = email.lower()
         if key in seen:
             continue
@@ -56,15 +57,6 @@ def _get_alert_recipients():
 
 
 def _should_send_alert(node_id, status, now, last_alert_status, last_alert_time):
-    """
-    Rules:
-    - SAFE: never send.
-    - First alert for a node: always send.
-    - Status escalates (SAFE→WARNING, SAFE→FIRE, WARNING→FIRE): send only if
-      at least ALERT_REMINDER_COOLDOWN seconds have passed since last alert.
-    - Status unchanged and risky: send only after cooldown (periodic reminder).
-    - Downgrade (FIRE→WARNING) or re-entry after safe: treated same as escalation.
-    """
     if status not in ("WARNING", "FIRE"):
         return False
 
@@ -76,8 +68,8 @@ def _should_send_alert(node_id, status, now, last_alert_status, last_alert_time)
     if elapsed < ALERT_REMINDER_COOLDOWN:
         return False
 
-    # Past cooldown: send if risky (new escalation or persistent risk).
     return True
+
 
 def send_alert_email(node_id, status, temp, smoke, hum):
     recipients = _get_alert_recipients()
@@ -181,10 +173,10 @@ class Command(BaseCommand):
 
                             if _should_send_alert(node_key, status, now, last_alert_status, last_alert_time):
                                 last_alert_time[node_key] = now
+                                last_alert_status[node_key] = status
                                 send_alert_email(node_key, status, temp, smoke, int(hum))
-
-                            # Always record latest status so next cycle can detect escalation/downgrade.
-                            last_alert_status[node_key] = status
+                            elif status == "SAFE":
+                                last_alert_status[node_key] = "SAFE"
 
                         elif "node_id:" in line:
                             logger.warning("Unparsed sensor line: %s", line)

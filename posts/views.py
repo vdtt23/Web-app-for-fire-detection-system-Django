@@ -342,3 +342,10 @@ def support(request):
 @login_required(login_url='/login/')
 def node_map(request):
     return render(request, 'posts/nodemap.html')
+
+
+@login_required(login_url='/login/')
+def heartbeat(request):
+    import time
+    request.session['last_heartbeat'] = int(time.time())
+    return JsonResponse({'ok': True})

@@ -20,4 +20,5 @@ urlpatterns = [
     path("api/nodes/", views.latest_nodes),
     path("api/nodes/<int:node_id>/history/", views.node_history),
     path("api/alerts/", views.latest_alerts),
+    path("api/heartbeat/", views.heartbeat),
 ]
