@@ -11,11 +11,13 @@
 
 <h2>Realtime Sensor Chart</h2>
 
-<div class="card">
-    <canvas id="sensorChart"></canvas>
+<div class="card chart-card">
+    <div class="chart-wrap">
+        <canvas id="sensorChart"></canvas>
+    </div>
 </div>
 
-<table class="node-table">
+<table class="node-table" id="latest-node-table">
     <thead>
         <tr>
             <th>Node</th>
@@ -28,7 +30,7 @@
     <tbody>
         {% for node in nodes %}
         <tr class="row-{{ node.status|lower }}">
-            <td>{{ node.note_id }}</td>
+            <td>{{ node.node_id }}</td>
             <td>{{ node.temperature }}</td>
             <td>{{ node.smoke }}</td>
             <td>{{ node.humidity }}</td>
@@ -37,6 +39,43 @@
         {% endfor %}
     </tbody>
 </table>
+
+<div class="card history-card">
+    <h3 id="history-title">Node History</h3>
+    <p id="history-subtitle" class="history-subtitle">Select a node and optional date range to view history.</p>
+    <div class="history-controls">
+        <label for="history-node-select">Node</label>
+        <select id="history-node-select">
+            <option value="">Select node</option>
+        </select>
+
+        <label for="history-start-date">From</label>
+        <input type="date" id="history-start-date">
+
+        <label for="history-end-date">To</label>
+        <input type="date" id="history-end-date">
+
+        <button type="button" id="history-apply-btn">Apply</button>
+        <button type="button" id="history-clear-btn" class="btn-secondary">Clear</button>
+        <button type="button" id="history-export-btn" class="btn-secondary">Export CSV</button>
+    </div>
+    <table class="node-table history-table">
+        <thead>
+            <tr>
+                <th>Time</th>
+                <th>Temp</th>
+                <th>Smoke</th>
+                <th>Humidity</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="node-history-body">
+            <tr>
+                <td colspan="5" class="history-empty">No node selected.</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 
 {% endblock %}
 

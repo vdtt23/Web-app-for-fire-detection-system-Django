@@ -3,39 +3,118 @@
 {% block content %}
 
 <style>
+.map-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.map-header {
+    margin-bottom: 20px;
+    color: #1f2937;
+}
+
+.map-header h2 {
+    margin: 0 0 15px 0;
+    font-size: 28px;
+    color: #1f2937;
+    font-weight: 600;
+}
+
+.map-legend {
+    display: flex;
+    gap: 20px;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
 #map {
     position: relative;
-    width: 800px;
-    height: 500px;
-    border: 2px solid #ccc;
-    background: #f5f5f5;
+    width: 100%;
+    height: 600px;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    cursor: grab;
+    user-select: none;
 }
 
-.node {
+svg {
+    width: 100%;
+    height: 100%;
+}
+
+.node-group {
+    cursor: pointer;
+}
+
+.node-icon {
+    filter: drop-shadow(0 0 8px currentColor);
+}
+
+.node-group.safe .node-icon {
+    color: #22c55e;
+}
+
+.node-group.warning .node-icon {
+    color: #f59e0b;
+}
+
+.node-group.fire .node-icon {
+    color: #ef4444;
+}
+
+.node-tooltip {
     position: absolute;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
+    background: rgba(15, 23, 42, 0.95);
+    color: white;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    pointer-events: none;
+    display: none;
+    z-index: 100;
+    border: 1px solid rgba(203, 213, 225, 0.2);
 }
-
-.safe { background: green; }
-.warning { background: orange; }
-.fire { background: red; }
-
-.legend { margin-bottom: 10px; }
-.box { margin-right: 10px; display: inline-block; }
 </style>
 
-<h2>IoT Node Map</h2>
+<div class="map-container">
+    <div class="map-header">
+        <h2>IoT Node Map</h2>
+        <div class="map-legend">
+            <div class="legend-item">
+                <div class="legend-dot" style="background: #22c55e;"></div>
+                <span>SAFE</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot" style="background: #f59e0b;"></div>
+                <span>WARNING</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot" style="background: #ef4444;"></div>
+                <span>FIRE</span>
+            </div>
+        </div>
+    </div>
 
-<div class="legend">
-    <span class="box">🟢 SAFE</span>
-    <span class="box">🟡 WARNING</span>
-    <span class="box">🔴 FIRE</span>
+    <div id="map"></div>
 </div>
 
-<div id="map"></div>
+<div class="node-tooltip" id="tooltip"></div>
 
 {% endblock %}
 
@@ -44,46 +123,135 @@
 const MAP_WIDTH = 800;
 const MAP_HEIGHT = 500;
 
+// Pan state (in SVG coordinate space)
+let isPanning = false;
+let panStart = { x: 0, y: 0 };
+let viewBox = { x: 0, y: 0 };
+let svgRef = null;
+
 function getColor(status) {
     if (status === "FIRE") return "fire";
     if (status === "WARNING") return "warning";
     return "safe";
 }
 
+function createNodeSVG(n) {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("width", "32");
+    svg.setAttribute("height", "32");
+    svg.setAttribute("fill", "none");
+    svg.setAttribute("stroke", "currentColor");
+    svg.setAttribute("stroke-width", "2");
+    svg.setAttribute("class", "node-icon");
+
+    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    circle.setAttribute("cx", "12");
+    circle.setAttribute("cy", "12");
+    circle.setAttribute("r", "9");
+
+    const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    dot.setAttribute("cx", "12");
+    dot.setAttribute("cy", "12");
+    dot.setAttribute("r", "2");
+    dot.setAttribute("fill", "currentColor");
+
+    svg.appendChild(circle);
+    svg.appendChild(dot);
+    return svg;
+}
+
 function loadNodes() {
     fetch("/api/nodes/")
         .then(res => res.json())
         .then(nodes => {
+            const mapEl = document.getElementById("map");
 
-            const map = document.getElementById("map");
-            map.innerHTML = "";
+            // Reuse existing SVG or create new one
+            let svgElement = mapEl.querySelector("svg");
+            if (!svgElement) {
+                svgElement = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                svgElement.setAttribute("preserveAspectRatio", "xMidYMid meet");
+                svgElement.style.width = "100%";
+                svgElement.style.height = "100%";
+                mapEl.appendChild(svgElement);
+                svgRef = svgElement;
+            }
 
-            console.log("nodes:", nodes);
+            // Update viewBox to reflect current pan
+            svgElement.setAttribute("viewBox", `${viewBox.x} ${viewBox.y} ${MAP_WIDTH} ${MAP_HEIGHT}`);
+
+            // Clear and re-render nodes
+            svgElement.innerHTML = "";
 
             nodes.forEach(n => {
-
                 if (n.x == null || n.y == null) return;
 
-                let ratioX = n.x / 100;
-                let ratioY = n.y / 100;
+                let x = Math.min((n.x / 100) * MAP_WIDTH, MAP_WIDTH - 20);
+                let y = Math.min((n.y / 100) * MAP_HEIGHT, MAP_HEIGHT - 20);
 
-                let x = ratioX * MAP_WIDTH;
-                let y = ratioY * MAP_HEIGHT;
+                const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                g.setAttribute("class", "node-group " + getColor(n.status));
+                g.setAttribute("transform", `translate(${x}, ${y})`);
 
-                x = Math.min(x, MAP_WIDTH - 10);
-                y = Math.min(y, MAP_HEIGHT - 10);
+                g.appendChild(createNodeSVG(n));
 
-                const node = document.createElement("div");
-                node.className = "node " + getColor(n.status);
+                g.addEventListener("mouseenter", (e) => {
+                    const tooltip = document.getElementById("tooltip");
+                    tooltip.textContent = `Node ${n.node_id} | T:${n.temperature}° S:${n.smoke} H:${n.humidity}%`;
+                    tooltip.style.display = "block";
+                    tooltip.style.left = (e.clientX + 10) + "px";
+                    tooltip.style.top = (e.clientY + 10) + "px";
+                });
+                g.addEventListener("mousemove", (e) => {
+                    const tooltip = document.getElementById("tooltip");
+                    tooltip.style.left = (e.clientX + 10) + "px";
+                    tooltip.style.top = (e.clientY + 10) + "px";
+                });
+                g.addEventListener("mouseleave", () => {
+                    document.getElementById("tooltip").style.display = "none";
+                });
 
-                node.style.left = x + "px";
-                node.style.top = y + "px";
-
-                map.appendChild(node);
+                svgElement.appendChild(g);
             });
         })
         .catch(err => console.error(err));
 }
+
+// Drag-to-pan: convert screen delta to SVG coordinate delta
+const mapEl = document.getElementById("map");
+
+mapEl.addEventListener("mousedown", (e) => {
+    if (e.target.closest(".node-group")) return;
+    isPanning = true;
+    panStart = { x: e.clientX, y: e.clientY };
+    mapEl.style.cursor = "grabbing";
+    e.preventDefault();
+});
+
+window.addEventListener("mousemove", (e) => {
+    if (!isPanning || !svgRef) return;
+
+    const rect = mapEl.getBoundingClientRect();
+    const scaleX = MAP_WIDTH / rect.width;
+    const scaleY = MAP_HEIGHT / rect.height;
+
+    const dx = (e.clientX - panStart.x) * scaleX;
+    const dy = (e.clientY - panStart.y) * scaleY;
+    panStart = { x: e.clientX, y: e.clientY };
+
+    viewBox.x -= dx;
+    viewBox.y -= dy;
+
+    svgRef.setAttribute("viewBox", `${viewBox.x} ${viewBox.y} ${MAP_WIDTH} ${MAP_HEIGHT}`);
+});
+
+window.addEventListener("mouseup", () => {
+    if (isPanning) {
+        isPanning = false;
+        mapEl.style.cursor = "grab";
+    }
+});
 
 setInterval(loadNodes, 2000);
 loadNodes();

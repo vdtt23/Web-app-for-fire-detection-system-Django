@@ -1,0 +1,66 @@
+{% extends 'posts/base.html' %}
+
+{% block content %}
+<h1 class="page-title">Account</h1>
+
+<div class="account-grid">
+    <section class="card account-card">
+        <h3>User Information</h3>
+        <p class="account-note">Update your personal details.</p>
+
+        {% if profile_error %}
+        <div class="account-msg error">{{ profile_error }}</div>
+        {% endif %}
+        {% if profile_success %}
+        <div class="account-msg success">{{ profile_success }}</div>
+        {% endif %}
+
+        <form method="post" class="account-form">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="profile">
+
+            <label for="id_first_name">First Name</label>
+            <input id="id_first_name" type="text" name="first_name" value="{{ request.user.first_name|default:'' }}">
+
+            <label for="id_last_name">Last Name</label>
+            <input id="id_last_name" type="text" name="last_name" value="{{ request.user.last_name|default:'' }}">
+
+            <label for="id_email">Email</label>
+            <input id="id_email" type="email" name="email" value="{{ request.user.email|default:'' }}" required>
+
+            <button type="submit">Save User Information</button>
+        </form>
+    </section>
+
+    <section class="card account-card">
+        <h3>Account Information</h3>
+        <p class="account-note">Change username or password.</p>
+
+        {% if account_error %}
+        <div class="account-msg error">{{ account_error }}</div>
+        {% endif %}
+        {% if account_success %}
+        <div class="account-msg success">{{ account_success }}</div>
+        {% endif %}
+
+        <form method="post" class="account-form">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="account">
+
+            <label for="id_username">Username</label>
+            <input id="id_username" type="text" name="username" value="{{ request.user.username }}" required>
+
+            <label for="id_current_password">Current Password</label>
+            <input id="id_current_password" type="password" name="current_password" required>
+
+            <label for="id_new_password">New Password</label>
+            <input id="id_new_password" type="password" name="new_password" placeholder="Leave blank to keep current password">
+
+            <label for="id_confirm_password">Confirm New Password</label>
+            <input id="id_confirm_password" type="password" name="confirm_password" placeholder="Repeat new password">
+
+            <button type="submit">Save Account Information</button>
+        </form>
+    </section>
+</div>
+{% endblock %}

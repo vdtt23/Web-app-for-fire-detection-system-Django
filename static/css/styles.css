@@ -68,6 +68,7 @@ body {
 /* MENU */
 .menu {
     width: 100%;
+    flex: 1;
 }
 
 .menu a {
@@ -109,6 +110,37 @@ body {
     color: white;
 }
 
+/* LOGOUT BUTTON */
+.logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px;
+    margin-top: auto;
+    width: 100%;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #ef4444;
+    transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.sidebar:not(:hover) .logout-btn {
+    justify-content: center;
+    padding: 12px 0;
+    gap: 0;
+}
+
+.sidebar:not(:hover) .logout-btn .text {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+}
+
 /* ICON */
 .icon {
     position: relative;
@@ -123,6 +155,13 @@ body {
 }
 
 .icon svg {
+    width: 22px;
+    height: 22px;
+    display: block;
+    stroke: currentColor;
+}
+
+.logout-btn .icon svg {
     width: 22px;
     height: 22px;
     display: block;
@@ -163,11 +202,14 @@ body {
 .main {
     margin-left: 80px;
     padding: 30px;
-    width: 100%;
+    width: calc(100% - 80px);
+    box-sizing: border-box;
+    transition: margin-left 0.25s ease, width 0.25s ease;
 }
 
 .sidebar:hover ~ .main {
     margin-left: 240px;
+    width: calc(100% - 240px);
 }
 
 /* CARD */
@@ -182,6 +224,25 @@ body {
     box-shadow: 0 10px 25px rgba(0,0,0,0.05);
 }
 
+.chart-card {
+    background: #ffffff;
+    backdrop-filter: none;
+}
+
+.chart-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 1250px;
+    height: clamp(460px, 62vh, 760px);
+    margin: 0 auto;
+}
+
+#sensorChart {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+}
+
 /* TITLE */
 .page-title {
     font-size: 28px;
@@ -194,6 +255,80 @@ body {
     width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
+}
+
+.node-table tbody tr {
+    cursor: pointer;
+}
+
+.node-table tbody tr.is-selected {
+    background: #e0e7ff;
+}
+
+.history-card {
+    margin-top: 18px;
+}
+
+.history-controls {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 12px 0 8px;
+}
+
+.history-controls label {
+    font-size: 13px;
+    color: #374151;
+    font-weight: 600;
+}
+
+.history-controls select,
+.history-controls input {
+    height: 34px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 0 10px;
+    font-size: 13px;
+    color: #111827;
+    background: #fff;
+}
+
+.history-controls button {
+    height: 34px;
+    border: 0;
+    border-radius: 8px;
+    padding: 0 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    background: #4f46e5;
+    cursor: pointer;
+}
+
+.history-controls button:hover {
+    background: #4338ca;
+}
+
+.history-controls button.btn-secondary {
+    background: #e5e7eb;
+    color: #1f2937;
+}
+
+.history-controls button.btn-secondary:hover {
+    background: #d1d5db;
+}
+
+.history-subtitle {
+    margin: 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.history-empty {
+    text-align: center;
+    color: #6b7280;
+    padding: 20px 12px;
 }
 
 /* header */
@@ -230,4 +365,83 @@ body {
     border: 2px solid #ccc;
     background: #f5f5f5;
     margin-top: 20px;
+}
+
+.account-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 18px;
+}
+
+.account-card h3 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.account-note {
+    margin: 6px 0 14px;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.account-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.account-form label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.account-form input {
+    height: 38px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 0 12px;
+    font-size: 14px;
+    color: #111827;
+    background: #fff;
+}
+
+.account-form input:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.14);
+}
+
+.account-form button {
+    margin-top: 8px;
+    height: 38px;
+    border: 0;
+    border-radius: 8px;
+    background: #4f46e5;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.account-form button:hover {
+    background: #4338ca;
+}
+
+.account-msg {
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+.account-msg.error {
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    color: #dc2626;
+}
+
+.account-msg.success {
+    background: #f0fdf4;
+    border: 1px solid #86efac;
+    color: #166534;
 }
