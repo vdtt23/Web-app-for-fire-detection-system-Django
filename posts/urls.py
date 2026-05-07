@@ -17,6 +17,7 @@ urlpatterns = [
     path('about/', views.about),
     path('support/', views.support),
     path("api/chart/", views.chart_data),
+    path("api/chart/<int:node_id>/", views.node_chart_data),
     path("api/nodes/", views.latest_nodes),
     path("api/nodes/<int:node_id>/history/", views.node_history),
     path("api/alerts/", views.latest_alerts),

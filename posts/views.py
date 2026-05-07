@@ -256,6 +256,18 @@ def chart_data(request):
     return JsonResponse(data)
 
 @login_required(login_url='/login/')
+def node_chart_data(request, node_id):
+    qs = SensorData.objects.filter(node_id=node_id).order_by('-created_at')[:20][::-1]
+
+    data = {
+        "labels": [timezone.localtime(d.created_at).strftime("%H:%M:%S") for d in qs],
+        "temp": [d.temperature for d in qs],
+        "smoke": [d.smoke for d in qs],
+        "humidity": [d.humidity for d in qs],
+    }
+    return JsonResponse(data)
+
+@login_required(login_url='/login/')
 def latest_nodes(request):
     nodes = {}
     qs = SensorData.objects.order_by('-created_at')
